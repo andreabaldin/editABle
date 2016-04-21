@@ -1,0 +1,62 @@
+﻿body {
+}
+
+:invalid {
+    background-color: #FDD;
+    color: #F00;
+    font-weight: 900;
+}
+
+:-moz-submit-invalid {
+    box-shadow: none;
+}
+
+:-moz-ui-invalid {
+    box-shadow: none;
+}
+
+.invalid {
+    background-color: #FDD;
+}
+
+.edited {
+    font-style: italic;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+    height: 28px;
+}
+
+th, tr  {
+    line-height: 28px;
+}
+
+th, td {
+    padding: 5px;
+}
+
+
+    td input.editABle, select.editABle {
+        float: left;
+        display: block;
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #DDD !important;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+    }
+
+    td input[type=checkbox] {
+        width: 90%;
+    }
+
+    td.editABle {
+        margin: 0;
+        padding: 0;
+    }
