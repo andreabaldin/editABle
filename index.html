@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>editABle</title>
 </head>
-<body>
+<tbody>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
-    <link href="/style.css" rel="stylesheet" />
+    <link href="./style.css" rel="stylesheet" />
 
+    <label for="xxx">my input</label>
     <input id="xxx" type="text" autofocus />
 
     <br />
@@ -17,10 +18,10 @@
     <div>
         <h1>table A</h1>
         <div style="width: 900px">
-            <table id="tableA" data-role="edit" border="1" width="100%">
+            <table id="tableA" role="edit" border="1" width="100%">
 
-                <col width="10%">
                 <col width="30%">
+                <col width="10%">
                 <col width="20%">
                 <col width="5%">
                 <col width="15%">
@@ -28,97 +29,179 @@
 
                 <thead>
                     <tr>
-                        <th rowspan="2">Col0</th>
-                        <th colspan="2">Col1-2</th>
-                        <th rowspan="2">Col3</th>
-                        <th rowspan="2">Col4</th>
-                        <th rowspan="2">Col5</th>
+                        <th rowspan="2">text</th>
+                        <th colspan="2">cols 1-2</th>
+                        <th rowspan="2">bool</th>
+                        <th rowspan="2">fancy</th>
+                        <th rowspan="2">cool</th>
                     </tr>
                     <tr>
-                        <th rowspan="2">Col1</th>
-                        <th rowspan="2">Col2</th>
+                        <th rowspan="2">num</th>
+                        <th rowspan="2">dropdown</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr id="0" data-role="edit">
-                        <td id="0_0"></td>
-                        <td id="0_1" title="tooltip demo: min 6 chrs" pattern="^.{6,}$"></td>
-                        <td id="0_2" value="e">EEEEE</td>
-                        <td id="0_3" type="text" template=""></td>
-                        <td id="0_4"></td>
-                        <td id="0_5"></td>
+                    <tr id="A0">
+                        <td id="A0_0">text...</td>
+                        <td id="A0_1" class="number">1.2</td>
+                        <td id="A0_2" value="a">A</td>
+                        <td id="A0_3" title="tooltip demo. This is the cell tooltip inheritated by the input">tooltip</td>
+                        <td id="A0_4" role="locked" class="center" title="this cell is locked">cell locked</td>
+                        <td id="A0_5" title="RegEx validation (min 6 chrs)" pattern="^.{6,}$">abcdef</td>
                     </tr>
-                    <tr id="1" data-role="edit">
-                        <td id="1_0" style="text-align: left">1</td>
-                        <td id="1_1" style="text-align: left" value="ABCD" title="tooltip demo: min 6 chrs" pattern="^.{6,}$">ABCD</td>
-                        <td id="1_2" style="text-align: left" value="f">FFFFFF</td>
-                        <td id="1_3" value="false" style="text-align: left"></td>
-                        <td id="1_4" style="text-align: left" afterupdate="alert('value:' + value + ' text:' + text)"></td>
-                        <td id="1_5">1</td>
+                    <tr id="A1">
+                        <td id="A1_0">text...</td>
+                        <td id="A1_1" class="number" value="2.345678" view="+0.00" format="+0.00">2.3</td>
+                        <td id="A1_2" value="b">BB</td>
+                        <td id="A1_3" value="false" class="text"></td>
+                        <td id="A1_4" afterupdate="alert('(afterupdate) value:' + value + '   text:' + text)"></td>
+                        <td id="A1_5" class="number" type="numeric" afterupdate=plus1()>1</td>
                     </tr>
-                    <tr id="2" data-role="edit">
-                        <td id="2_0" style="text-align: center">1</td>
-                        <td id="2_1" style="text-align: center">abc</td>
-                        <td id="2_2" name="music" style="text-align: center" value="r">Rock</td>
-                        <td id="2_3" value="true"><input type="checkbox" value="checked" disabled checked /></td>
-                        <td id="2_4" style="text-align: center" template='<i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> $value'><i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> 2</td>
-                        <td id="2_5" style="text-align: center"></td>
+                    <tr id="A2" afterupdate="alert('callback function called at line exit')">
+                        <td id="A2_0" class="cell callback" onblur="alert('cell onblur !')" title="cell onblur">text...</td>
+                        <td id="A2_1" class="number" title="cell afterupdate" afterupdate="alert('callback function called at input exit')">23.45</td>
+                        <td id="A2_2" value="a" title="cell onblur and afterupdate"
+                            data-options="&lt;option value='e'&gt;EEEEE&lt;/option&gt;&lt;option value='f'&gt;FFFFFF&lt;/option&gt;&lt;option value='g'&gt;GGGGGGG&lt;/option&gt;"
+                            onblur="alert('cell onblur !')" afterupdate="alert('callback function called at input exit')">
+                            CCC
+                        </td>
+                        <td id="A2_3" value="true"><input type="checkbox" value="checked" disabled checked /></td>
+                        <td id="A2_4" class="text" template='<i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> $value'><i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> 2</td>
+                        <td id="A2_5" class="text"></td>
                     </tr>
-                    <tr id="0" data-role="edit">
-                        <td id="3_0" style="text-align: right" title="inline text-align='right'"></td>
-                        <td id="3_1" style="text-align: right" title="inline text-align='center'">A</td>
-                        <td id="3_2" style="text-align: right" title="inline text-align='right'"></td>
-                        <td id="3_3" value="false" style="text-align: right" type="text" title="inline type='text'"></td>
-                        <td id="3_4" style="text-align: right" title="tooltip r1"></td>
-                        <td id="3_5" style="text-align: right" type="checkbox" value="true" template='<input type="checkbox" value="$value" disabled />'><input type="checkbox" value="true" disabled /></td>
+                    <tr id="A0">
+                        <td id="A3_0" class="center" title="inline text-align='right'">centered text...</td>
+                        <td id="A3_1" class="number" title="inline text-align='center'">345.6</td>
+                        <td id="A3_2" name="music" value="Rock" title="options by js">Rock</td>
+                        <td id="A3_3" value="false" class="text" type="text" title="inline type='text'"></td>
+                        <td id="A3_4" class="numeric" type="range" min="0" max="10" step="0.5" value="1.2345" title="tooltip r1"></td>
+                        <td id="A3_5" class="text" type="checkbox" value="true" template='<input type="checkbox" value="$value" disabled />'><input type="checkbox" value="true" disabled /></td>
                     </tr>
-                    <tr id="0" data-role="edit">
-                        <td id="4_0" name="zero" type="combobox" value="I" data-options="&lt;option value='h'&gt;H9&lt;/option&gt;&lt;option value='I'&gt;i10&lt;/option&gt;&lt;option value='J'&gt;J11&lt;/option&gt;"></td>
-                        <td id="4_1" type="textarea"></td>
-                        <td id="4_2" type="button"></td>
-                        <td id="3_3" value="true" template='<input type="checkbox" value="checked" disabled />'><input type="checkbox" value="checked" disabled /></td>
-                        <td id="4_4" type="combobox" value="I" data-options="&lt;option value='h'&gt;H9&lt;/option&gt;&lt;option value='II'&gt;i10&lt;/option&gt;&lt;option value='JJJ'&gt;J11&lt;/option&gt;">i10</td>
-                        <td id="4_5">4</td>
+                    <tr id="A0">
+                        <td id="A4_0" class="right">right aligned test...</td>
+                        <td id="A4_1" class="number">0</td>
+                        <td id="A4_2" class="center" name="colors" value="F00" title="options by js, with value and text">Red</td>
+                        <td id="A3_3" value="true" template='<input type="checkbox" value="checked" disabled />'><input type="checkbox" value="checked" disabled /></td>
+                        <td id="A4_4" type="combobox" value="I" data-options="&lt;option value='h'&gt;H9&lt;/option&gt;&lt;option value='II'&gt;i10&lt;/option&gt;&lt;option value='JJJ'&gt;J11&lt;/option&gt;">i10</td>
+                        <td id="A4_5">4</td>
                     </tr>
                 </tbody>
-                <tfoot style="display:none" afterupdate="alert('this function is called at line exit')">
-                    <tr role="template" style="display:none" afterupdate="alert('zio ' + g + ' zio ' + p)">
-                        <td name="headZero"></td>
-                        <td name="headOne" title="^.{6,}$" pattern="^.{6,}$"></td>
-                        <td name="headTwo" style="text-align: center" type="combobox" pattern="^\w{1,}" data-options="&lt;option value='e'&gt;EEEEE&lt;/option&gt;&lt;option value='f'&gt;FFFFFF&lt;/option&gt;&lt;option value='g'&gt;GGGGGGG&lt;/option&gt;"></td>
-                        <td name="headThree" style="text-align: center" type="checkbox"><b>$boolValue</b></td>
-                        <td name="headFor" value="false" template='<input type="checkbox" checked="$value" disabled />'></td>
-                        <td name="headFive" style="text-align: left" type="text"><b>$boolValue</b></td>
+                <tfoot style="display:none">
+                    <tr id="B$row_$col" role="template" style="display:none">
+                        <td name="col0" class="text"></td>
+                        <td name="col1" class="number" type="number" view="+0.0" format="+0.00"></td>
+                        <td name="col2" class="center" type="combobox" data-options="&lt;option value='a'&gt;A&lt;/option&gt;&lt;option value='b'&gt;BB&lt;/option&gt;&lt;option value='c'&gt;CCC&lt;/option&gt;&lt;option value='d'&gt;DDDD&lt;/option&gt;"></td>
+                        <td name="col3" class="text" type="checkbox"></td>
+                        <td name="col4" class="text" type="text" value="false" celltemplate='<input type="checkbox" checked="$value" disabled />'></td>
+                        <td name="col5" class="text" type="text"><b>$boolValue</b></td>
                     </tr>
                 </tfoot>
+            </table>
+            <div></div>
+        </div>
+    </div>
+
+    <br />
+    <label for="yyy">another input</label>
+    <input id="yyy" type="text" />
+    <br />
+
+    <div>
+        <h1>table B</h1>
+        <div style="width: 900px">
+            <table id="tableB" role="edit" border="1" width="100%">
+
+                <col width="30%">
+                <col width="10%">
+                <col width="20%">
+                <col width="5%">
+                <col width="15%">
+                <col width="25%">
+
+                <thead>
+                    <tr>
+                        <th rowspan="2">text</th>
+                        <th colspan="2">cols 1-2</th>
+                        <th rowspan="2">bool</th>
+                        <th rowspan="2">fancy</th>
+                        <th rowspan="2">cool</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">num</th>
+                        <th rowspan="2">dropdown</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
             </table>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+    <script src="./editABle.js"></script>
+    <script>
 
-    <br />
+        var cmbBxOptns = {}
+        cmbBxOptns.music = '<option>Blues</option><option>Pop</option><option>Rock</option><option>Soul</option>';
+        cmbBxOptns.colors = '<option value="FFF">White</option><option value="F00">Red</option><option value="00F">Blue</option><option value="0F0">Green</option>';
+        cmbBxOptns.fruits = '<option>Apple</option><option>Banana</option><option>Orange</option><option>Pear</option>';
+
+        var _tableA = {
+            autofocus: 0,
+            behaviours: { debug: true, leave: false },
+            comboBoxOptions: cmbBxOptns
+        };
+        $('#tableA').editABle(_tableA);
 
 
-    <input id="xxx" type="text" />
+        var _tableB = {
+            autofocus: 0,
+            behaviours: { render: true, debug: true },
+            comboBoxOptions: cmbBxOptns,
+            template: {
+                id: "B$row_$col",
+                celltemplate: [
+                    { name: "col1", class: "text" },
+                    { name: "col1", type: "number", type: "number", view: "+0.0", format: "+0.00" },
+                    { name: "col2", class: "center", type: "combobox", options: "&lt;option value='a'&gt;A&lt;/option&gt;&lt;option value='b'&gt;BB&lt;/option&gt;&lt;option value='c'&gt;CCC&lt;/option&gt;&lt;option value='d'&gt;DDDD&lt;/option&gt;" },
+                    { name: "col3", class: "text", type: "checkbox" },
+                    { name: "col4", class: "text", type: "text", value: "false", template: '<input type="checkbox" checked="$value" disabled />' },
+                    { name: "col5", class: "text", type: "text" }
+                ]
+            },
+            data: [
+                { data: ["text...", 1.2, "A", "tooltip", { text: "cell locked", role: "locked" }, "abcdef"] },
+                { data: ["text...", { text: 2.3, value: 2.345678 }, "BB", null, null, {text: 1, class: "number"}] },
+                {
+                    name: "music",
+                    data: ["text...", 23.45, "CCC", null, null, null]
+                },
+                {
+                    name: "colors",
+                    data: [
+                        "centered text...", 
+                        345.6, "Rock", 
+                        { celltemplate: '<i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> $value', text: '<i class="fa fa-cog fa-spin fa-lg fa-fw margin-bottom"></i> 2' },
+                        null, 
+                        null
+                    ]
+                },
+                {
+                    id: "B$row_$col",
+                    name: "colors",
+                    data: ["right aligned test...", 0, "F00", null, null, null]
+                },
+            ]
+        };
+        $('#tableB').editABle(_tableB);
 
-</body>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-<script src="/editABle.js"></script>
-<script>
-    var cmbBxOptns = {}
-    cmbBxOptns.music = '<option value="b">Blues</option><option value="p">Pop</option><option value="r">Rock</option><option value="s">Soul</option>';
-    cmbBxOptns.letters = '<option value="a">A</option><option value="b">BB</option><option value="c">CCC</option><option value="d">DDDD</option>';
+        function plus1() {
+            console.log("_p.value: " + _p.value++);
+        }
 
-    $('#tableA').editABle({
-        autofocus: 0,
-        behaviours: { debug: true, leave: false },
-        comboBoxOptions: cmbBxOptns
-    });
-
-    var g = "gino";
-    var p = "peppino";
-
-</script>
+    </script>
 
 </html>

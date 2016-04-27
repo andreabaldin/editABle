@@ -1,8 +1,10 @@
 ﻿/*  editABle.js - by Andrea Baldin @ ab SoftLab LTD (NZ) 
-    ver: 0.1 Apr 2016 - MIT license (MIT)
+    ver: 0.2 Apr 2016 - MIT license (MIT)
+    NOTICE: type="number" uses Numeral.js library, see: http://numeraljs.com/ for details.  Include it from cdnjs.com
 */
 $.fn.editABle = function (parameters) {
     'use strict';
+    var _move = "td[role!='locked']:first";
     return $(this).each(
 
         function () {
@@ -16,7 +18,7 @@ $.fn.editABle = function (parameters) {
                 activeGrid = $(this),
                 activeRow,
                 activeCell,
-                rowTemplate = parameters.template || $(this).first().find("tr[role='template']"),
+                rowTemplate = $(this).first().find("tr[role='template']"),
                 cellTemplate,
                 template,
                 inputType,
@@ -30,23 +32,23 @@ $.fn.editABle = function (parameters) {
                         activeCell = activeGrid.find('tbody td:focus');
                         activeRow = activeCell.closest("tr");
                         var _ci = activeCell.index();
-                        cellTemplate = rowTemplate.find("td").eq(_ci);                                      // ... Get details at same-index cellTemplate first-row
+                        cellTemplate = parameters.template ? parameters.templateparameters.template[_ci] : rowTemplate.find("td").eq(_ci);  // ... Get details at same-index cellTemplate first-row
 
                         if (parameters.behaviours.debug)
                             console.log("showEditor cell index:" + _ci);
 
-                        var tableMode = activeGrid.attr('data-role') || "edit";
+                        var tableMode = activeGrid.attr("role") || "edit";
                         if (tableMode.indexOf("locked") >= 0 ||
-                        tableMode.indexOf("insert") >= 0 && !activeRow.hasClass("newRow") ||
-                            activeCell.data('role') == "locked" ||
-                                activeCell.data('role') != "edit" && cellTemplate.data('role') == "locked" ||
-                                    activeRow.data('role') == "locked") {
+                                tableMode.indexOf("insert") >= 0 && !activeRow.hasClass("newRow") ||
+                                    activeCell.attr("role") == "locked" ||
+                                        activeCell.attr("role") != "edit" && cellTemplate.attr("role") == "locked" ||
+                                            activeRow.attr("role") == "locked") {
                             if (parameters.behaviours.debug)
                                 console.log("showEditor cell not for editing");
                             return false;
                         }
 
-                        activeGrid.attr("data-currentRow", activeRow.index());                              // ... trace the current row on <table data-currentRow="n">
+                        activeGrid.attr("data-currentRow", activeRow.index());                      // ... trace the current row on <table data-currentRow="n">
 
                         inputType = activeCell.attr("type") || cellTemplate.attr("type") || "text";
                         template = activeCell[0].hasAttribute("template") ? activeCell.attr("template") : cellTemplate[0].innerHTML;
@@ -134,31 +136,59 @@ $.fn.editABle = function (parameters) {
                 },
 
                 afterUpdate = function (_afterupdate) {
-                    if (_afterupdate)
-                        invokeFunction(_afterupdate, window);
+                    if (_afterupdate) {
+                        if (parameters.behaviours.debug)
+                            console.log("afterUpdate: " + _afterupdate);
+                        return invokeFunction(_afterupdate.trim(), window);
+                    }
                 },
 
                 // ... Eg. invokeFunction("My.Namespace.functionName(a, b)", window)
                 invokeFunction = function (functionName, context) {
-                    var _parts = functionName.split("(");                                           // ... ["My.Namespace.functionName", " a, b)"]
-                    var _namespaces = _parts.shift().split(".");                                    // ... ["My", "Namespace", "functionName"]    /    [" a, b)"]
+                    var _opIdx = functionName.indexOf("(");                                         // ... 25
+                    var _clIdx = functionName.lastIndexOf(")");                                     // ... 30
+                    var _params = "[" + functionName.substr(_opIdx + 1, _clIdx - _opIdx - 1) + "]"; // ... "[a,b]"
+                    var _namespaces = functionName.substr(0, _opIdx).split(".");                    // ... ["My", "Namespace", "functionName"]
                     var _functionName = _namespaces.pop();                                          // ... "functionName"    /    ["My", "Namespace"]
                     for (var i = 0; i < _namespaces.length; i++)
                         context = context[_namespaces[i]];                                          // ... window["My"]["Namespace"]
-                    var _params = "[ " + _parts[0].replace(")", "") + " ]";                         // ... "[ a, b ]"
                     var _args = Object(eval(_params));                                              // ... { <a_value>, <b_value> }
                     return context[_functionName].apply(context, _args);                            // ... window["My"]["Namespace"]["functionName"](<a_value>, <b_value>)
                 },
 
                 setCellContent = function (_txt, _val) {
 
-                    _val = _val || (inputType == "checkbox" ? inputElement.is(':checked') : inputElement.val());
-                    _txt = _txt || (inputType == "combobox" ? inputElement.find("option:selected").text() : undefined);
+                    if (!inputElement)
+                        return false;
 
-                    boolValue = Boolean(_val || _txt);
+                    switch (inputType) {
+
+                        case "combobox":
+                            value = _val || inputElement.is(':checked');
+                            text = _txt || inputElement.find("option:selected").text();
+                            break;
+
+                        case "number":
+                            var _viewStr = inputElement.attr("view");
+                            var _frmtStr = inputElement.attr("format");
+                            value = _val || inputElement.val();
+                            if (_frmtStr)
+                                value = numeral(value).format(_frmtStr)
+                            text = _viewStr ? numeral(value).format(_viewStr) : undefined;
+                            break;
+
+                        default:
+                            value = _val || inputElement.val();
+                            text = _txt || undefined;
+                            break;
+                    }
+
+                    afterUpdate(inputElement.attr("afterUpdate"));                              // ... invoke cell afterupdate function, if any
+                    boolValue = Boolean(value || text);
+
                     var _checkValidity = inputElement[0].checkValidity();
                     if (parameters.behaviours.debug)
-                        console.log("setCellContent, template='" + template + "'   text='" + _txt + "'   value='" + _val + "'   boolValue=" + boolValue + "'   checkValidity=" + _checkValidity);
+                        console.log("setCellContent, template='" + template + "'   text='" + text + "'   value='" + value + "'   boolValue=" + boolValue + "'   checkValidity=" + _checkValidity);
 
                     // ... writing final attributes to table cell
                     activeCell
@@ -166,32 +196,81 @@ $.fn.editABle = function (parameters) {
                         .addClass("edited")
                         .toggleClass("invalid", !_checkValidity);
 
-                    activeCell.attr("lastText", _txt != undefined ? _txt : _val);
+                    activeCell.attr("lastText", text != undefined ? text : value);
                     if (activeCell[0].hasAttribute("value")) {
                         activeCell
-                            .attr("value", _val != undefined ? _val : _txt)
-                            .attr("lastValue", _val != undefined ? _val : _txt);
+                            .attr("value", value != undefined ? value : text)
+                            .attr("lastValue", value != undefined ? value : text);
                     }
 
                     // ... finalise td content
                     if (template) {
-                        _txt = template.replace("$text", _txt);
-                        _txt = _txt.replace("$value", _val);
-                        _txt = _txt.replace("$boolValue", boolValue);
+                        text = template.replace("$text", text);
+                        text = text.replace("$value", value);
+                        text = text.replace("$boolValue", boolValue);
                     }
 
-                    value = _val;
-                    text = _txt;
                     if (!parameters.behaviours.leave) {
                         inputElement.remove();
-                        activeCell.html(_txt != undefined ? _txt : _val);
+                        activeCell.html(text != undefined ? text : value);
                     }
 
-                    afterUpdate(inputElement.attr("afterUpdate"));                                  // ... invoke cell afterupdate function, if any
+                    if (parameters) {
+                        parameters.lastCell = {};
+                        parameters.lastCell.boolValue = boolValue;
+                        parameters.lastCell.value = value;
+                        parameters.lastCell.text = text;
+                    }
 
                     inputType = null;
                     inputElement = null;
+                },
+
+                rowsRender = function () {
+
                 };
+
+
+            if (parameters.behaviours.render && parameters.data.length > 0) {
+
+                if (parameters.behaviours.debug)
+                    console.log("Grid rendering Start");
+
+                var _tbodycontent = [];
+                for (var _r = 0; _r < parameters.data.length; _r++) {
+                    var _row = $('<tr>');
+                    for (var _c = 0; _c < parameters.data[_r].data.length; _c++) {
+
+                        var _cell = $('<td>');
+                        var _id = parameters.template.id || "$row_$col";
+                        _id = _id.replace(/\$row/g, _r).replace(/\$col/g, _c);
+                        _cell.attr("id", _id);
+
+                        for (var _key in parameters.template.celltemplate[_r]) {
+                            if (parameters.template.celltemplate[_r].hasOwnProperty(_key))
+                                _cell.attr(_key, parameters.template.celltemplate[_r][_key]);
+                        }
+
+                        var _x = parameters.data[_r].data[_c];
+                        if (_x && typeof _x == "object")
+                            for (var _key in _x) {
+                                if (_x.hasOwnProperty(_key))
+                                    _cell.attr(_key, _x[_key]);
+                            }
+                        else
+                            _cell.text(_x);
+                        _row.append(_cell);
+
+                    }
+                    _tbodycontent.push(_row);
+                }
+                activeGrid
+                    .find("tbody")
+                    .replaceWith(_tbodycontent);
+
+                if (parameters.behaviours.debug)
+                    console.log("Grid rendering End");
+            };
 
 
             // ... Activate editing
@@ -222,14 +301,15 @@ $.fn.editABle = function (parameters) {
                             break;
 
                         case TAB:
+                        case ENTER:
                             if (_editMode) {
                                 e.stopPropagation();
                                 e.preventDefault();
                                 _currentCell = inputElement.closest('td');
                                 if (e.shiftKey)
-                                    _nextCell = _currentCell.prev("td[data-role!='locked']");
+                                    _nextCell = _currentCell.prevAll(_move);
                                 else
-                                    _nextCell = _currentCell.next("td[data-role!='locked']");
+                                    _nextCell = _currentCell.nextAll("td[role != 'locked']").first();
                                 setCellContent();
                                 if (_nextCell.index() >= 0) {
                                     _nextCell.focus();
@@ -238,23 +318,10 @@ $.fn.editABle = function (parameters) {
                                     activeGrid.trigger(_e);
                                     inputElement.focus();
                                 } else {
-                                    _currentCell.focus();
                                     afterUpdate(rowTemplate.attr("afterUpdate"));                   // ... invoke row template afterupdate function, if any
+                                    _currentCell.focus();
                                 }
                                 return false;
-                            }
-                            break;
-
-                        case ENTER:
-                            if (_editMode) {
-                                _currentCell = inputElement.closest('td');
-                                _nextCell = _currentCell.next("td[data-role!='locked']");
-                                if (_nextCell.index() < 0) {
-                                    setCellContent();
-                                    _currentCell.focus();
-                                    afterUpdate(rowTemplate.attr("afterUpdate"));                   // ... invoke row template afterupdate function, if any
-                                    return false;
-                                }
                             }
                             break;
 
@@ -262,14 +329,14 @@ $.fn.editABle = function (parameters) {
                             if (_editMode) {
                                 if (inputType == "combobox" || inputElement.val() == "") {
                                     _currentCell = inputElement.closest('td');
-                                    _nextCell = _currentCell.prev("td[data-role!='locked']");
+                                    _nextCell = _currentCell.prev(_move);
                                 }
                             } else
-                                _nextCell = _currentCell.prev("td[data-role!='locked']");
+                                _nextCell = _currentCell.prev(_move);
                             break;
 
                         case ARROW_RIGHT:
-                            _nextCell = _currentCell.next("td[data-role!='locked']");
+                            _nextCell = _currentCell.next(_move);
                             break;
 
                         case ARROW_UP:
@@ -305,12 +372,24 @@ $.fn.editABle = function (parameters) {
             );
 
             // ... Set tabindex to enabled cells
-            activeGrid.find("tbody tr[data-role='edit']").each(
+            activeGrid.find("tbody tr[role!='locked']").each(
                 function () {
-                    $(this).find("td[data-role!='locked']").prop('tabindex', 0);
+                    $(this).find("td[role != 'locked']").prop('tabindex', 0);
                 }
             );
 
+            // ... Equivalent to C# String.format()
+            if (!String.format) {
+                String.format = function (format) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    return format.replace(/{(\d+)}/g, function (match, number) {
+                        return typeof args[number] != 'undefined'
+                          ? args[number]
+                          : match
+                        ;
+                    });
+                };
+            }
         }
     );
 };
